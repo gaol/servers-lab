@@ -22,12 +22,12 @@ Then access the servlet using address:
 	Content-Length: 206
 	Date: Thu, 22 Jun 2017 06:32:02 GMT
 
-	&lt;html&gt;&lt;head&gt;&lt;title&gt;servlet-security&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
-	&lt;h1&gt;Successfully called Secured Servlet &lt;/h1&gt;
-	&lt;p&gt;Principal  : jduke&lt;/p&gt;
-	&lt;p&gt;Remote User : jduke&lt;/p&gt;
-	&lt;p&gt;Authentication Type : BASIC&lt;/p&gt;
-	&lt;/body&gt;&lt;/html&gt;
+	<html><head><title>servlet-security</title></head><body>
+	<h1>Successfully called Secured Servlet </h1>
+	<p>Principal  : jduke</p>
+	<p>Remote User : jduke</p>
+	<p>Authentication Type : BASIC</p>
+	</body></html>
 
 
 

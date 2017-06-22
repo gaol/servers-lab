@@ -28,13 +28,14 @@ Usage
 --------------------
 * Pull the docker image using command:
 > docker pull aoingl/servers-lab:latest
+
 > docker run -ti --name servers-lab aoingl/servers-lab:latest /bin/bash
 
 * The OpenLDAP server is not started by default, in Docker enviornment, please use the following command instead of `systemd` to start it:
 > start-ldap.sh
 
 * The default provision imported `templates/jboss.ldif` into the DIT, with the following content:
-
+<pre>
 	dn: dc=jboss,dc=org
 	dc: jboss
 	objectClass: top
@@ -65,6 +66,7 @@ Usage
 	cn: Admin
 	member: uid=jduke,ou=Users,dc=jboss,dc=org
 
+</pre>
 
 So the following command can be used to do the ldapsearch:
 
@@ -74,11 +76,11 @@ So the following command can be used to do the ldapsearch:
 
 > docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' &lt;YOUR-DOCKER-CONTAINER-ID&gt;
 
-> NOTE: If you want to use TLS connection, remember to add the following lines into your local ldap client configuration:
-> in /etc/openldap/ldap.conf
-> HOST 172.17.0.2
-> PORT 636
-> TLS_REQCERT ALLOW
+NOTE: If you want to use TLS connection, remember to add the following lines into your local ldap client configuration, in /etc/openldap/ldap.conf:
+
+	HOST 172.17.0.2
+	PORT 636
+	TLS_REQCERT ALLOW
 
 WildFly Configuration Examples to use this OpenLDAP Server
 ---------------
