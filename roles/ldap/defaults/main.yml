@@ -1,0 +1,19 @@
+---
+ldap_suffix: dc=jboss,dc=org
+ldap_rootdn: cn=Manager,dc=jboss,dc=org
+ldap_rootpw: password
+
+ldap_user: ldap
+
+ldap_ssl: true
+ldap_certificate_country: CN
+ldap_certificate_city: Beijing
+ldap_certificate_address: Fangshan
+ldap_certificate_org: JBoss
+ldap_certificate_cn: Leo
+
+ldap_import_files:
+  - /etc/openldap/jboss.ldif
+
+systemd_enable: true
+

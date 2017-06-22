@@ -1,0 +1,81 @@
+---
+
+- name: Install OpenLDAP packages for CentOS
+  yum: name={{ item }} state=installed
+  with_items:
+    - openldap-servers
+    - openldap-clients
+    - openssl
+
+- name: Produce hashed password for root DN
+  shell: slappasswd -s {{ ldap_rootpw }} 
+  register: root_password
+
+- name: Copy template configration in LDIF format to target machine
+  template: src={{ item }} dest=/etc/openldap/
+  with_items:
+    - tls.ldif
+    - config.ldif
+    - jboss.ldif
+    - ldap.conf
+
+- name: Copy wrapped scripts to openldap root directory
+  template: src={{ item }} dest=/etc/openldap/ owner={{ ldap_user }} mode=0755
+  with_items:
+    - start-ldap.sh
+    - stop-ldap.sh
+
+- name: Linked the scripts to /usr/bin/ directory
+  file: src=/etc/openldap/{{ item }} dest=/usr/bin/{{ item }} state=link owner={{ ldap_user }} mode=0755
+  with_items:
+    - start-ldap.sh
+    - stop-ldap.sh
+
+# configure SSL if enabled
+- name: Generate the private key if SSL is enabled
+  shell: openssl genrsa -out priv.key chdir=/etc/openldap/certs/ creates=/etc/openldap/certs/priv.key
+  when: ldap_ssl == true
+
+- name: Generate the certificate 
+  shell: openssl req -new -x509 -subj '/C={{ ldap_certificate_country}}/ST={{ ldap_certificate_city}}/L={{ ldap_certificate_address}}/O={{ ldap_certificate_org }}/CN={{ ldap_certificate_cn }}/' -days 3650 -key priv.key -out cert.crt -extensions v3_ca chdir=/etc/openldap/certs/ creates=/etc/openldap/certs/cert.crt
+  when: ldap_ssl == true
+
+# Starts OpenLDAP server, then configure it on the fly
+- name: Start the OpenLDAP service(slapd) using systemd
+  systemd: name=slapd state=started enabled=no
+  when: systemd_enable == true
+  
+- name: Start the OpenLDAP service(slapd) using script
+  shell: /etc/openldap/start-ldap.sh
+  when: systemd_enable != true
+  
+- name: Modify TLS if enabled
+  shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f /etc/openldap/tls.ldif
+  when: ldap_ssl == true
+
+- name: Modify other configuration
+  shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f /etc/openldap/config.ldif
+
+- name: Added more LDAP schemas
+  shell: ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/{{ item }}
+  with_items:
+    - cosine.ldif
+    - dyngroup.ldif
+    - inetorgperson.ldif
+    - java.ldif
+    - nis.ldif
+    - misc.ldif
+    - openldap.ldif
+
+- name: Import additional LDIF files
+  shell: ldapadd -D "{{ ldap_rootdn }}" -w {{ ldap_rootpw }} -f {{ item }}
+  with_items: "{{ ldap_import_files }}"
+
+- name: Stop the OpenLDAP service(slapd) using systemd
+  systemd: name=slapd state=stopped
+  when: systemd_enable == true
+  
+- name: Stop the OpenLDAP service(slapd) using script
+  shell: /etc/openldap/stop-ldap.sh
+  when: systemd_enable != true
+  
