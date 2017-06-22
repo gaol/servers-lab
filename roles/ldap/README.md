@@ -93,6 +93,5 @@ Step1: Start the servers-lab Docker container:
 
 Step2: Configure your wildfly
 ---
-1. Start WildFly Full:
-> bin/standalone.sh
-2. 
+For details, please take look at [Example Web](example-web/README.md)
+
