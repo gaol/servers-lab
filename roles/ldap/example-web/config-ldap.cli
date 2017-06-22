@@ -1,0 +1,11 @@
+batch
+/subsystem=elytron/dir-context=dir-context-localhost:add(url="ldap://172.17.0.2:389",principal="uid=jduke,ou=Users,dc=jboss,dc=org",credential-reference={clear-text=theduke})
+
+/subsystem=elytron/ldap-realm=ldap-realm-localhost:add(dir-context=dir-context-localhost,identity-mapping={rdn-identifier=uid,search-base-dn="ou=Users,dc=jboss,dc=org",user-password-mapper={from=userPassword},attribute-mapping=[{filter-base-dn="ou=Roles,dc=jboss,dc=org",filter="(member={1})",from=cn,to=groups}]})
+
+/subsystem=elytron/security-domain=ldap-security-domain:add(realms=[{realm=ldap-realm-localhost,role-decoder=groups-to-roles}],default-realm=ldap-realm-localhost,permission-mapper=default-permission-mapper)
+
+/subsystem=elytron/http-authentication-factory=ldap-localhost-http-authentication-factory:add(http-server-mechanism-factory=global,security-domain=ldap-security-domain,mechanism-configurations=[{mechanism-name=BASIC,mechanism-realm-configurations=[{realm-name="Ldap Elytron"}]}])
+
+/subsystem=undertow/application-security-domain=servlet-security-quickstart:add(http-authentication-factory=ldap-localhost-http-authentication-factory)
+run-batch

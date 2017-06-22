@@ -1,0 +1,11 @@
+/subsystem=undertow/application-security-domain=servlet-security-quickstart:remove()
+
+/subsystem=elytron/http-authentication-factory=ldap-localhost-http-authentication-factory:remove()
+
+/subsystem=elytron/security-domain=ldap-security-domain:remove()
+
+/subsystem=elytron/ldap-realm=ldap-realm-localhost:remove()
+
+/subsystem=elytron/dir-context=dir-context-localhost:remove()
+
+:reload
