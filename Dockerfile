@@ -14,5 +14,7 @@ ADD . /opt/servers-lab/
 
 RUN ansible-playbook -e "systemd_enable=false" -i "localhost," -c local /opt/servers-lab/servers.yml
 
+VOLUME /var/lib/mysql
+
 # Expose 389 & 636 for LDAP
-EXPOSE 389 636
+EXPOSE 389 636 3306

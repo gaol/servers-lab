@@ -1,5 +1,20 @@
 ---
 - hosts: all
+  vars:
+    - mysql_databases:
+      - name: testDB
+        collation: utf8_general_ci
+        encoding: utf8
+    - mysql_users:
+      - name: testUser
+        host: '%'
+        password: testPass
+        priv: 'testDB.*:ALL'
+      - name: testUser
+        host: 'localhost'
+        password: testPass
+        priv: 'testDB.*:ALL'
 
   roles:
     - ldap
+    - mysql

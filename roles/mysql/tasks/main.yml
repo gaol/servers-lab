@@ -1,0 +1,65 @@
+---
+
+#- name: Import Mariadb rpm key
+#  rpm_key: key=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+
+- name: Install Mariadb packages
+  yum: name={{ item }} state=installed
+  with_items:
+    - mariadb-server
+    - mariadb
+    - MySQL-python
+
+- name: Set up Mariadb db
+  shell: /usr/bin/mysql_install_db --basedir={{ mysql_base_dir }} --user={{ mysql_user }} --datadir={{ mysql_data_dir }}  --skip-name-resolve
+
+- name: Copy start and stop scripts to bin directory
+  template: src={{ item }} dest=/usr/bin/ mode=0755 owner=root
+  with_items:
+    - start-mysql.sh
+    - stop-mysql.sh
+
+- name: Copy my.cnf global MySQL configuration.
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_config_file }}"
+    owner: "{{ mysql_user }}"
+    group: "{{ mysql_user }}"
+    mode: 0644
+    force: "yes"
+
+- name: Start MariaDB Server
+  shell: /usr/bin/start-mysql.sh
+
+- name: Update root user password
+  shell: /usr/bin/mysqladmin -S/var/lib/mysql/mysql.sock -u{{ mysql_root_username }} password '{{ mysql_root_password }}'
+
+- name: Update root user password with specific IP Address
+  shell: /usr/bin/mysqladmin -S/var/lib/mysql/mysql.sock -u{{ mysql_root_username }} -h{{ ansible_default_ipv4.address }} password '{{ mysql_root_password }}'
+
+- name: Create MySQL databases
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation | default('utf8_general_ci') }}"
+    encoding: "{{ item.encoding | default('utf8') }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+    state: present
+  with_items: "{{ mysql_databases }}"
+  
+- name: Create MySQL users
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host | default('localhost') }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('*.*:USAGE') }}"
+    state: "{{ item.state | default('present') }}"
+    append_privs: "{{ item.append_privs | default('no') }}"
+    login_unix_socket: "/var/lib/mysql/mysql.sock"
+    login_user: "{{ mysql_root_username }}"
+    login_password: "{{ mysql_root_password }}"
+  with_items: "{{ mysql_users }}"
+
+- name: Stop MariaDB Server
+  shell: /usr/bin/stop-mysql.sh
