@@ -12,7 +12,7 @@ if [ -e $pidFile ]; then
       kill $pid
       exit 1
     fi
-    echo -e "MySQL Xerver is started successfully!"
+    echo -e "MySQL Server is started successfully!"
   else
     echo -e "MySQL Server failed to start!"
     exit 1
