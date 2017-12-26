@@ -1,0 +1,13 @@
+---
+#
+# roles installed by ansible-galaxy to set up a testing environment
+
+- src: geerlingguy.jenkins
+  version: 3.2.2
+
+- src: geerlingguy.java
+  version: 1.7.4
+
+- src: greendayonfire.mongodb
+  version: v2.2.0
+ 

@@ -1,0 +1,8 @@
+---
+#
+# roles installed by ansible-galaxy to set up a testing environment
+
+- src: geerlingguy.jenkins
+  version: 3.2.2
+
+ 

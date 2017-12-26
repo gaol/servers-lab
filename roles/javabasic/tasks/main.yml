@@ -1,0 +1,11 @@
+---
+
+- name: Install EPEL
+  yum: name=epel-release state=installed
+
+- name: Install Basic Java related packages
+  yum: name={{ item }} state=installed
+  with_items:
+    - java-1.8.0-openjdk-devel
+    - maven
+    - groovy

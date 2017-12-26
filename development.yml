@@ -1,0 +1,59 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+      # java packages
+      java_packages:
+        - java-1.8.0-openjdk-devel
+        - maven
+        - gradle
+
+      # jekins configuraiton
+      jenkins_package_state: latest
+      jenkins_http_port: 8090
+      jenkins_plugins:
+        - scm-api
+        - git
+        - mercurial
+        - branch-api
+        - structs
+        - bitbucket
+      jenkins_plugins_state: present
+
+      # mongodb configuraiton
+      mongodb_package: mongodb-org
+      mongodb_version: "3.4"
+      mongodb_manage_service: true
+      mongodb_net_bindip: 127.0.0.1, 0.0.0.0
+      mongodb_net_port: 27017
+      mongodb_security_authorization: "disabled"
+      mongodb_storage_dbpath: /data/db
+      mongodb_systemlog_destination: "file"
+      mongodb_systemlog_logappend: true
+      mongodb_systemlog_path: /var/log/mongodb/mongod.log
+      mongodb_logrotate: true
+      mongodb_logrotate_options:
+        - compress
+        - copytruncate
+        - daily
+        - dateext
+        - rotate 7
+        - size 10M
+      mongodb_user_admin_name: admin
+      mongodb_user_admin_password: admin
+      mongodb_root_admin_name: rootAdmin
+      mongodb_root_admin_password: rootAdmin
+      mongodb_users:
+        - {
+          name: userAdmin,
+          password: userAdmin,
+          roles: readWrite,
+          database: training_main
+        }
+
+  roles:
+    - geerlingguy.java
+    - geerlingguy.jenkins
+    - greendayonfire.mongodb
+

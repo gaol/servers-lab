@@ -1,0 +1,21 @@
+---
+
+- name: Install mongodb server - non docker environment
+  yum: name={{ item }} state=installed
+  with_items:
+    - mongodb
+    - mongodb-server
+  when: not docker
+
+- name: docker pull mongo/3.6 image - dev/testing environment
+  docker_image:
+    name: mongo
+    tag: 3.6
+  when: docker
+
+- name: start mongodb server
+  service: name=docker state=started
+  when: not docker
+
+- name: import initial data to mongodb
+  command: echo 'import data....'
